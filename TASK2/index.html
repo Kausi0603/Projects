@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>To-Do List Application</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to left, #000, #4e83b4);
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        h4 {
+            text-align: center;
+            color: red;
+            margin-bottom: 20px;
+        }
+        .input-container {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        input[type="text"],
+        input[type="datetime-local"] {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
+            margin: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background: linear-gradient(to left, #000, #4e83b4);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color .3s ease;
+            margin: 5px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
+        }
+        li:hover {
+            background-color: #f2f2f2;
+        }
+        li span {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+        li button {
+            background-color: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            transition: color .3s ease;
+        }
+        li button:hover {
+            color: #333;
+        }
+        .completed {
+            text-decoration: line-through;
+            color: #888;
+        }
+        .overdue {
+            color: red;
+        }
+        @media (max-width: 600px) {
+            .input-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            input[type="text"],
+            input[type="datetime-local"],
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>To-Do List</h1>
+        <h4>*Task whose due date over</h4>
+        <div class="input-container">
+            <input type="text" id="taskInput" placeholder="Add new task...">
+            <input type="datetime-local" id="dueDateTimeInput">
+            <button onclick="addTask()">Add</button>
+        </div>
+        <ul id="taskList"></ul>
+    </div>
+    <script>
+        var tasks = [];
+
+        function addTask() {
+            var input = document.getElementById("taskInput");
+            var dueDateInput = document.getElementById("dueDateTimeInput");
+            var task = input.value;
+            var dueDate = dueDateInput.value;
+            input.value = "";
+            dueDateInput.value = "";
+
+            if (task === "") {
+                alert("Please enter a task!");
+                return;
+            }
+            if (dueDate === "") {
+                alert("Please enter a due date!");
+                return;
+            }
+
+            var taskList = document.getElementById("taskList");
+            var li = document.createElement("li");
+            var checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            li.appendChild(checkbox);
+            li.appendChild(document.createTextNode(task + " (Due: " + formatDueDate(dueDate) + ")" ));
+
+            var formattedDueDate = new Date(dueDate).getTime();
+            tasks.push({ task: task, dueDate: formatDueDate(dueDate), completed: false, timestamp: formattedDueDate });
+            tasks.sort((a, b) => {
+                if (a.completed && !b.completed) return 1;
+                if (!a.completed && b.completed) return -1;
+                return a.timestamp - b.timestamp;
+            });
+            taskList.innerHTML = "";
+
+            var currentTimestamp = Date.now();
+
+            tasks.forEach(function (task, index) {
+                var newLi = document.createElement("li");
+                var newCheckbox = document.createElement("input");
+                newCheckbox.type = "checkbox";
+                newLi.appendChild(newCheckbox);
+                var taskText = document.createElement("span");
+                taskText.innerText = task.task + " (Due: " + task.dueDate + ")";
+
+                if (task.timestamp < currentTimestamp && !task.completed) {
+                    taskText.classList.add("overdue");
+                }
+
+                if (task.completed) {
+                    taskText.classList.add("completed");
+                    newCheckbox.checked = true;
+                }
+                newLi.appendChild(taskText);
+                newCheckbox.addEventListener("change", function() {
+                    tasks[index].completed = this.checked;
+                    if (this.checked) {
+                        taskText.classList.add("completed");
+                    } else {
+                        taskText.classList.remove("completed");
+                    }
+                    if (task.timestamp < currentTimestamp && !task.completed) {
+                        alert("Task '" + task.task + "' is overdue! You have not completed the task in allocated time.");
+                    }
+                    tasks.sort((a, b) => {
+                        if (a.completed && !b.completed) return 1;
+                        if (!a.completed & b.completed) return -1;
+                        return a.timestamp - b.timestamp;
+                    });
+                    taskList.innerHTML = "";
+
+                    var currentTimestamp = Date.now();
+
+                    tasks.forEach(function (task, index) {
+                        var newLi = document.createElement("li");
+                        var newCheckbox = document.createElement("input");
+                        newCheckbox.type = "checkbox";
+                        newLi.appendChild(newCheckbox);
+                        var taskText = document.createElement("span");
+                        taskText.innerText = task.task + " (Due: " + task.dueDate + ")";
+
+                        if (task.timestamp < currentTimestamp && !task.completed) {
+                            taskText.classList.add("overdue");
+                            alert("Task '" + task.task + "' is overdue! You have not completed the task in allocated time.");
+                        }
+
+                        if (task.completed) {
+                            taskText.classList.add("completed");
+                            newCheckbox.checked = true;
+                        }
+                        newLi.appendChild(taskText);
+                        newCheckbox.addEventListener("change", function() {
+                            tasks[index].completed = this.checked;
+                            if (this.checked) {
+                                taskText.classList.add("completed");
+                            } else {
+                                taskText.classList.remove("completed");
+                            }
+                            if (task.timestamp < currentTimestamp && !task.completed) {
+                                alert("Task '" + task.task + "' is overdue! You have not completed the task in allocated time.");
+                            }
+                        });
+                        taskList.appendChild(newLi);
+                    });
+                });
+                taskList.appendChild(newLi);
+            });
+        }
+
+        function formatDueDate(dueDate) {
+            var date = new Date(dueDate);
+            var day = date.getDate();
+            var month = date.toLocaleString("default", { month: "short" });
+            var hours = date.getHours();
+            var minutes = date.getMinutes();
+            var formattedDate = day + "-" + month + "-" + hours + ":" + (minutes < 10 ? '0' : '') + minutes;
+            return formattedDate;
+        }
+    </script>
+</body>
+</html>
