@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dice Game</title>
+   <style>
+    /* styles.css */
+
+/* Reset some default browser styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Global styles */
+body {
+    font-family: "Arial", sans-serif;
+    background-color: #042f4b;
+    margin: 0;
+    text-align: center;
+    color: #4ecca3;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    font-family: "Lobster", cursive;
+    font-size: 4.5rem;
+    text-shadow: 5px 0 #232931;
+    margin: 30px 0;
+}
+
+.row {
+    display: flex; /* Display players in a row */
+    justify-content: center; /* Center the players horizontally */
+    align-items: center; /* Center the players vertically */
+}
+
+.player {
+    flex: 1; /* Make each player take equal space in the row */
+    margin: 10px;
+}
+
+p.player-name {
+    font-size: 2rem;
+    font-family: "Indie Flower", cursive;
+}
+
+.dice {
+    margin-top: 10px;
+} 
+
+img.dice-img {
+    max-width: 100%;
+}
+
+.btn {
+    background: #4ecca3;
+    font-family: "Indie Flower", cursive;
+    border-radius: 7px;
+    color: #fff;
+    font-size: 24px;
+    padding: 12px 20px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background: #232931;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 3rem;
+    }
+
+    p.player-name {
+        font-size: 1.5rem;
+    }
+
+    .btn {
+        font-size: 18px;
+        padding: 10px 16px;
+    }
+}
+
+   </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Let's Play</h1>
+        <div class="row">
+            <div class="player">
+                <p class="player-name" id="player1">Player1</p>
+                <img src="dice6.png" alt="dice 6" class="dice-img" id="img1">
+            </div>
+            <div class="player">
+                <p class="player-name" id="player2">Player2</p>
+                <img src="dice6.png" alt="dice 6" class="dice-img" id="img2">
+            </div>
+        </div>
+        <div class="container bottom">
+            <button type="button" class="btn" id="rollButton">Roll The Dice</button>
+        </div>
+        <div class="container bottom">
+            <button type="button" class="btn" id="editNamesButton">Edit Names</button>
+        </div>
+    </div>
+    <script>
+        // script.js
+
+        // Player names
+        let player1 = "Player1";
+        let player2 = "Player2";
+
+        // Event listener for editing player names
+        document.getElementById("editNamesButton").addEventListener("click", editNames);
+
+        // Event listener for rolling the dice
+        document.getElementById("rollButton").addEventListener("click", rollTheDice);
+
+        function editNames() {
+            player1 = prompt("Change Player1 Name");
+            player2 = prompt("Change Player2 Name");
+
+            if (!player1 || !player2) {
+                alert('Please enter valid names.');
+                return;
+            }
+
+            document.getElementById("player1").textContent = player1;
+            document.getElementById("player2").textContent = player2;
+        }
+
+        function rollTheDice() {
+            let diceNum1 = document.getElementById("img1");
+            let diceNum2 = document.getElementById("img2");
+
+            diceNum1.setAttribute("src", "diceroll.gif");
+            diceNum2.setAttribute("src", "diceroll.gif");
+
+            let result = document.querySelector('h1');
+            result.innerHTML = "";
+
+            setTimeout(() => {
+                let randomNumber1 = Math.floor(Math.random() * 6) + 1;
+                let randomNumber2 = Math.floor(Math.random() * 6) + 1;
+
+                diceNum1.setAttribute('src', 'dice' + randomNumber1 + '.png');
+                diceNum2.setAttribute('src', 'dice' + randomNumber2 + '.png');
+
+                // Determine the winner
+                if (randomNumber1 === randomNumber2) {
+                    result.textContent = "Draw!";
+                } else if (randomNumber1 < randomNumber2) {
+                    result.textContent = (player2 + " WINS!");
+                } else {
+                    result.textContent = (player1 + " WINS!");
+                }
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
